@@ -66,7 +66,7 @@ def top_k(domains: list[str],
         for id in idx[-k:]:
             # this checks if the current window returned at least k max scores
             if local_max[id] > 0:
-                global_max.append(uniq_pairs[id])
+                global_max.append((uniq_pairs[id], local_max[id]))
 
         # window_len += 1
 
@@ -176,9 +176,11 @@ def scoring(ed: int, max_ed: int) -> float:
 if __name__ == "__main__":
     with open("../shubs-subdomains.txt") as wordlist:
         n = 1000
-        words = [ word.strip() for word in wordlist.readlines()[:n] ]
+        ns = np.array([10,50,100,200,1000], dtype=np.uint16)
+        words = [ word.strip() for word in wordlist.readlines() ]
         threshold = 0.50
-        top = top_k(words, 5, math.floor(0.25*n), threshold)
 
-        print(top)
+        for size in ns:
+            top = top_k(words[:size], math.floor(0.25*size), math.floor(0.5*size))
+            print(top)
 
