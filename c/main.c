@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
     char translated[128];
     size_t translated_sz = 0; 
 
+    printf("Domain,Leet,Edit Distance,Score\n");
     for (size_t i = 0; i < DNS_LIST_CAP; ++i) {
         domain_sz = 0;
         translated_sz = 0;
