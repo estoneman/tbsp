@@ -1,4 +1,6 @@
-# ![LOGO](./img/tbsp.png) tbsp (text-based similarity preliminary)
+![LOGO](https://abcteach-content-s3-blob-storage.s3.us-east-2.amazonaws.com
+       /abcteach-content-free/docs/free_preview/t/tablespoonbw_p.png)
+# tbsp (text-based similarity preliminary)
 
 ## The Initial Idea
 Here are the initial efforts made towards the final project in Cybersecurity
