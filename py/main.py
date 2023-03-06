@@ -102,12 +102,21 @@ def edit_distance(X: str, Y: str) -> int:
 
             E[i, j] = min(a,b,c)
 
-    # print(reconstruct(E, X, Y))
-
-    # return E[len_X - 1, len_Y - 1]
     return E[len_X, len_Y]
 
+# TODO: Research if there is something valuable with the sequence of edits to
+#   transform X -> Y
 def reconstruct(E: np.ndarray, X: str, Y: str) -> list[str]:
+    """Create the sequence of edits that transformed X -> Y
+
+    Arguments:
+    E -- matrix of edit distances of substrings of X and Y
+    X -- Original string to be edited
+    Y -- Transformed string
+
+    Returns:
+    For now, it returns a sequence of executed operations.
+    """
     i = len(X)
     j = len(Y)
 
@@ -131,18 +140,13 @@ def reconstruct(E: np.ndarray, X: str, Y: str) -> list[str]:
 
     return L
 
-def gaussian(x: int, eds: list[int]) -> float:
-    sigma = np.std(eds)
-    mu = np.mean(eds)
-
-    lhs = (1) / float(sigma * np.sqrt(2 * np.pi))
-    print(lhs)
-    rhs = np.exp(-0.5 * np.power(((x - mu) / sigma), 2))
-    print(rhs)
-
-    return lhs * rhs
-
 def scoring(ed: int, max_ed: int) -> float:
+    """Compute the score of an edit distance metric
+
+    Arguments:
+    ed      -- edit distance
+    max_ed  -- max edit distance A.K.A length of longest string in computing ed
+    """
     if ed == 0:
         return 1.0
     return 1 - (ed / float(max_ed))
