@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     UNUSED(argv);
 
     char *leet = (char*) malloc(LEET_LEN); 
-    readline(leet, "/Users/estoneman/Programming/projects/fun/1337ify/leet.txt", "r");
+    readline(leet, "leet.map", "r");
 
     char *dns = (char*) malloc(DNS_LIST_CAP);
     const char* fn = "domains.in";
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         }
         translated[translated_sz] = '\0';
         int ed = edit_distance(domain, translated);
-        printf("%s;%s;%d;%f\n", domain,
+        printf("%s,%s,%d,%.02f\n", domain,
                 translated,
                 ed,
                 scoring(ed, max(strlen(domain), strlen(translated))));
