@@ -71,6 +71,17 @@ def top_k(domains: list[str],
     return global_max
 
 def my_min(*args) -> int:
+    """Utility function to compute the min of a variable amount of arguments
+
+    Arguments:
+    *args -- collection of all arguments passed to the function
+
+    Returns:
+    minimum of all function arguments
+
+    Notes:
+    Assumes data type of arguments are real numbers
+    """
     min = args[0]
     for v in args:
         if v < min:
@@ -79,6 +90,15 @@ def my_min(*args) -> int:
     return min
 
 def edit_distance(X: str, Y: str) -> int:
+    """Compute the edit distance of X and Y
+
+    Arguments:
+    X -- Original word
+    Y -- Word to transform X into
+
+    Returns:
+    Minimum number of operations to transform X into Y
+    """
     len_X = len(X)
     len_Y = len(Y)
 
