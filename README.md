@@ -21,6 +21,7 @@ mechanism with highly-tuned parameters in order to accelerate runtime while
 maintaining some degree of accuracy. The current implementation in HinDom
 calculates the string similarity of every pair of with time complexity: 
 $$\Omega(n)$$ Depending on how I set my parameters to top k computation, I can
-drive down space and time resources while keeping high accuracy. Another gaol of mine is to include some level of feature extraction given a list of domain 
-names. Not only could I compute edit distance, but also include other string 
-metrics that I have yet to search for.
+drive down space and time resources while keeping high accuracy. Another goal of
+mine is to include some level of feature extraction given a list of domain
+names. Not only would I compute edit distance, but also include string metrics.
+
