@@ -1,4 +1,4 @@
-# tbsp
+# tbsp (text-based similarity preliminary)
 
 ## The Initial Idea
 Here are the initial efforts made towards the final project in Cybersecurity
