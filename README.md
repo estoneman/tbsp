@@ -20,7 +20,7 @@ My plans for the future include implementing a fully-functional sliding window
 mechanism with highly-tuned parameters in order to accelerate runtime while
 maintaining some degree of accuracy. The current implementation in HinDom
 calculates the string similarity of every pair of with time complexity: 
-$$\Omega(n)$$. The edit distance scoring function goes to 0 as the edit 
+$$\Omega(n)$$ The edit distance scoring function goes to 0 as the edit 
 distance goes to infinity. Therefore, my current implementation of sliding 
 windows computes the top k maximum scores per window. I am experimenting with 
 window sizes and values of k to find the optimal values to achieve my goal
