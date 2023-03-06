@@ -1,7 +1,15 @@
 import numpy as np
 import math
 
-def pairs(domains: list[str]) -> dict[str,str]:
+def pairs(domains: list[str]) -> tuple[str]:
+    """Build list of unique pairs of domain names
+
+    Arguments:
+    domains -- list of domain names to compute unique pairs on
+
+    Returns:
+    list of domain name pairs represented as a list of tuples
+    """
     domain_len = len(domains)
     result = []
 
@@ -15,6 +23,19 @@ def top_k(domains: list[str],
           k: int,
           window_len: int,
           threshold: float=0.70) -> list[str]:
+    """Return top k scores from each window
+
+    Positional Arguments:
+    domains     -- list of domains we are computing edit distance scores on
+    k           -- amount of maximum scores to store per window
+    window_len  -- size of window
+
+    Keyword Arguments:
+    threshold -- minimum score to keep per window
+
+    Returns:
+    top k domains from each sliding window
+    """
     domain_len = len(domains)
 
     if (window_len > domain_len):
@@ -126,51 +147,12 @@ def scoring(ed: int, max_ed: int) -> float:
         return 1.0
     return 1 - (ed / float(max_ed))
 
-def main() -> None:
-    # with open(
-    #         "/usr/local/opt/wordlists/seclists/" +
-    #         "Passwords/darkweb2017-top100.txt",
-    #         "r") as wordlist:
-
-    #     domains = [d.strip() for d in wordlist.readlines()]
-
-    #     for d1 in domains:
-    #         for d2 in domains:
-    #             if d1 != d2:
-    #                 ed = edit_distance(d1, d2)
-    #                 print(f"The edit distance of '{d1}' and '{d2}' is {ed}")
-    """
-        d1 = core.google.com
-        d2 = c0r3.g00g13.com
-    """
-    d1 = "mail.google.com"
-    d2 = "google.com"
-
-    eds = np.empty(2, dtype=np.uint8)
-    a = ''.join(d1.split('.')[0:-2])
-    a_len = len(a)
-
-    b = ''.join(d2.split('.')[0:-2])
-    b_len = len(b)
-
-    ed = edit_distance(a, b)
-    eds[0] = ed
-
-    c_len = len(c)
-
-    d = ''.join(d2.split('.')[-2:-1])
-    d_len = len(d)
-
-    ed = edit_distance(c, d)
-    eds[1] = ed
-
-    domain_score, sub_score = (scoring(eds[0], np.max([a_len, b_len])),
-                               scoring(eds[1], np.max([c_len, d_len])))
-
 if __name__ == "__main__":
-    with open("/usr/local/opt/wordlists/seclists/"
-              "Discovery/DNS/shubs-subdomains.txt") as wordlist:
-        words = [word.strip() for word in wordlist.readlines()[:1600] ]
-        top_5 = top_k(words, 5, math.floor(0.25*len(words)), 0.60)
-        print(top_5)
+    with open("../shubs-subdomains.txt") as wordlist:
+        n = 10000
+        words = [ word.strip() for word in wordlist.readlines()[:n] ]
+        threshold = 0.60
+        top = top_k(words, 5, math.floor(0.25*n), threshold)
+
+        print(top)
 
