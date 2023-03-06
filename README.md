@@ -15,6 +15,29 @@ essentially says how similar one word is to another. On the other hand, if the
 length of the longest word is 20 and it took 20 operations to transform to the
 other word, then the score will be 0; the two words are not similar at all.
 
+## Usage
+### Python
+```bash
+# environment setup
+> cd py
+> virtualenv -p=python3 .virtualenv
+> source .virtualenv/bin/activate
+> python --version # should be python3
+
+# install dependencies
+> python -m pip install -r requirements.txt
+
+# run module
+> python main.py
+```
+
+### C
+```bash
+# setup
+> cd c
+> make -k build && ./main
+```
+
 ## Next Steps
 My plans for the future include implementing a fully-functional sliding window
 mechanism with highly-tuned parameters in order to accelerate runtime while
