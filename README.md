@@ -1,4 +1,4 @@
-# tbsp (text-based similarity preliminary)
+# [LOGO](./img/tbsp.png) tbsp (text-based similarity preliminary)
 
 ## The Initial Idea
 Here are the initial efforts made towards the final project in Cybersecurity
