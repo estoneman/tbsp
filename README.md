@@ -33,8 +33,10 @@ other word, then the score will be 0; the two words are not similar at all.
 
 ### C
 ```bash
-# setup
+# navigate to c directory 
 > cd c
+
+# compile and run program
 > make -k build && ./main
 ```
 
