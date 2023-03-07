@@ -174,7 +174,7 @@ def scoring(ed: int, max_ed: int) -> float:
     return 1 - (ed / float(max_ed))
 
 if __name__ == "__main__":
-    with open("../shubs-subdomains.txt") as wordlist:
+    with open("../data/domains.in") as wordlist:
         n = 1000
         ns = np.array([10,50,100,200,1000], dtype=np.uint16)
         words = [ word.strip() for word in wordlist.readlines() ]
