@@ -1,21 +1,27 @@
 import numpy as np
 import math
+from tqdm import tqdm
 
 def pairs(domains: list[str]) -> tuple[str]:
-    """Build list of unique pairs of domain names
+    """Build list of unique pairs of domain names along with their edit distance
+    scores
 
     Arguments:
     domains -- list of domain names to compute unique pairs on
 
     Returns:
-    list of domain name pairs represented as a list of tuples
+    Returns a list of tuples of the form (domain,domain,score)
     """
     domain_len = len(domains)
     result = []
 
-    for i in range(domain_len):
+    for i in tqdm(range(domain_len)):
         for j in range(i + 1, domain_len):
-            result.append((domains[i], domains[j]))
+            X, X_len = domains[i], len(domains[i])
+            Y, Y_len = domains[j], len(domains[j])
+            S = round(scoring(edit_distance(X, Y), max(X_len, Y_len)), 2)
+
+            result.append((X, Y, S))
     
     return result
 
@@ -54,19 +60,19 @@ def top_k(domains: list[str],
     for i in range(0, domain_len, window_len):
         window = domains[i:i+window_len]
         uniq_pairs = pairs(window)
-        local_max = np.full(len(uniq_pairs), -1.0, dtype=np.float32)
+        local_max_len = int((window_len*(window_len - 1)) / 2)
+        local_max = np.full(local_max_len, -1.0, dtype=np.float32)
 
         for j in range(len(uniq_pairs)):
-            X, Y = uniq_pairs[j]
-            ed = edit_distance(X, Y) 
-            score = round(scoring(ed, len(X) if len(X) > len(Y) else len(Y)), 2)
-            if score > threshold:
-                local_max[j] = score
+            X, Y, S = uniq_pairs[j]
+            if S > threshold:
+                local_max[j] = S 
+
         idx = np.argpartition(local_max, -k)
         for id in idx[-k:]:
             # this checks if the current window returned at least k max scores
             if local_max[id] > 0:
-                global_max.append((uniq_pairs[id], local_max[id]))
+                global_max.append(uniq_pairs[id])
 
         # window_len += 1
 
@@ -175,12 +181,11 @@ def scoring(ed: int, max_ed: int) -> float:
 
 if __name__ == "__main__":
     with open("../data/domains.in") as wordlist:
-        n = 1000
         ns = np.array([10,50,100,200,1000], dtype=np.uint16)
         words = [ word.strip() for word in wordlist.readlines() ]
         threshold = 0.50
 
-        for size in ns:
-            top = top_k(words[:size], math.floor(0.25*size), math.floor(0.5*size))
+        for n in ns:
+            top = top_k(words[:n], math.floor(0.25*n), math.floor(0.4*n))
             print(top)
 
