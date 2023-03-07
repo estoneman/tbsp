@@ -3,3 +3,4 @@ img/
 py/.virtualenv
 .scsv
 main
+data/
