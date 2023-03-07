@@ -39,7 +39,9 @@ other word, then the score will be 0; the two words are not similar at all.
 # compile and run program
 > make -k build && ./main
 ```
-*NOTE*: I use C mainly for fun to showcase a previous project I completed
+*NOTE*: I use C mainly for fun to showcase a previous project I completed. I'm
+not using this functionality for the rest of the project, however it did
+contribute to a section of my preliminary results.
 
 ## Next Steps
 My plans for the future include implementing a fully-functional sliding window
