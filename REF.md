@@ -5,5 +5,4 @@
 - [RFC 1323](https://www.rfc-editor.org/rfc/rfc1323#page-8)
 
 # Microsoft TCP Description
-- [Windows TCP](https://learn.microsoft.com/en-us/troubleshoot/windows-server/
-    networking/description-tcp-features)
+- [Windows TCP](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/description-tcp-features)
