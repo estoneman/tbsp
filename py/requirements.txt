@@ -2,3 +2,4 @@ numpy
 jedi-language-server
 pynvim
 tqdm
+matplotlib
