@@ -4,3 +4,4 @@ py/.virtualenv
 .scsv
 main
 domains.in
+py/__*
