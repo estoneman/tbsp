@@ -2,8 +2,16 @@ import numpy as np
 import math
 from tqdm import tqdm
 import time
+from helper import AlgResponse
 
-def pairs(window: list[str], threshold: float) -> tuple[str]:
+""" TODO
+    - Finish debugging issue with window bounds
+    - Finish testing @ 1000 domains
+    - Implement helper "structs" (dataclasses) for data send/receive between the
+      sliding windows algorithm and edit distance computations
+"""
+
+def pairs(window: list[str], threshold: float) -> AlgResponse:
     """Build list of unique pairs of domain names along with their edit distance
     scores
 
@@ -14,13 +22,13 @@ def pairs(window: list[str], threshold: float) -> tuple[str]:
     Returns a list of tuples of the form (domain,domain,score)
     """
     window_sz = len(window)
-    result = []
+    data = []
 
     # for i in tqdm(range(window_sz)):
     # t1 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
     t1 = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
     # num_it = int(window_sz * (window_sz - 1) / 2)
-    for i in range(window_sz):
+    for i in tqdm(range(window_sz)):
         for j in range(i + 1, window_sz):
             X, X_len = window[i], len(window[i])
             Y, Y_len = window[j], len(window[j])
@@ -28,15 +36,17 @@ def pairs(window: list[str], threshold: float) -> tuple[str]:
             if S < threshold:
                 continue
 
-            result.append((X, Y, S))
+            data.append((X, Y, S))
 
     # t2 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
     t2 = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
-    s = (t2 - t1) / 1e9
+    time_elapsed = (t2 - t1) / 1e9
     # spit = s * math.pow(num_it, -1)
     # itps = math.pow(spit, -1)
 
-    return (result, s)
+    alg_response = AlgResponse(data, time_elapsed)
+
+    return alg_response
 
 def top_k(domains, 
           n: int,
@@ -85,33 +95,33 @@ def top_k(domains,
 
         # bounds check
         if n_processed + window_sz > n:
-            window_sz = n - n_processed
-            k = int(0.5*window_sz)
             print(f"computing on window {i}\n"
                   f"  n = {n}\n"
                   f"  window size = {window_sz}\n"
                   f"  domains processed = {n_processed}\n"
-                  f"  adjusting window size to {window_sz}\n"
-                  f"  adjusting k to {k}")
+                  f"  adjusting window size to {n - n_processed}\n"
+                  f"  adjusting k to {int(0.5*(n - n_processed))}")
+            window_sz = n - n_processed
+            k = int(0.5*window_sz)
 
         window = []
         for w in range(window_sz):
             window.append(next(domains))
 
-        uniq_pairs, t = pairs(window, threshold)
-        mttf.append(t)
+        alg_response = pairs(window, threshold)
+        mttf.append(alg_response.time_elapsed)
 
         local_max_len = int((window_sz*(window_sz - 1)) / 2)
         local_max = np.full(local_max_len, -1.0, dtype=np.float32)
 
-        for j in range(len(uniq_pairs)):
-            local_max[j]  = uniq_pairs[j][2]
+        for j in range(len(alg_response.data)):
+            local_max[j]  = alg_response.data[j][2]
 
         idx = np.argpartition(local_max, -k)
         for id in idx[-k:]:
             # return only non-negative max scores
             if local_max[id] > 0:
-                global_max.append(uniq_pairs[id])
+                global_max.append(alg_response.data[id])
 
         n_processed += window_sz
 
