@@ -5,3 +5,4 @@ py/.virtualenv
 main
 domains.in
 py/__*
+old_c/
