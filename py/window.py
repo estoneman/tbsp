@@ -2,7 +2,10 @@ import numpy as np
 import math
 from tqdm import tqdm
 import time
-from helper import AlgResponse
+from helper import PairsResponse, TopKResponse
+from itertools import combinations
+import multiprocessing as mp
+import os
 
 """ TODO
     - Finish debugging issue with window bounds
@@ -11,128 +14,72 @@ from helper import AlgResponse
       sliding windows algorithm and edit distance computations
 """
 
-def pairs(window: list[str], threshold: float) -> AlgResponse:
-    """Build list of unique pairs of domain names along with their edit distance
-    scores
+def score(pair):
+    if len(pair) != 2:
+        return 0.0
 
-    Arguments:
-    window -- list of domain names to compute unique pairs on
+    return scoring(pair[0], pair[1])
 
-    Returns:
-    Returns a list of tuples of the form (domain,domain,score)
-    """
-    window_sz = len(window)
-    data = []
-
-    # for i in tqdm(range(window_sz)):
-    # t1 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
-    t1 = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
-    # num_it = int(window_sz * (window_sz - 1) / 2)
-    for i in tqdm(range(window_sz)):
-        for j in range(i + 1, window_sz):
-            X, X_len = window[i], len(window[i])
-            Y, Y_len = window[j], len(window[j])
-            S = round(scoring(edit_distance(X, Y), max(X_len, Y_len)), 2)
-            if S < threshold:
-                continue
-
-            data.append((X, Y, S))
-
-    # t2 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
-    t2 = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
-    time_elapsed = (t2 - t1) / 1e9
-    # spit = s * math.pow(num_it, -1)
-    # itps = math.pow(spit, -1)
-
-    alg_response = AlgResponse(data, time_elapsed)
-
-    return alg_response
+def construct_window(domains, w):
+    for i in range(w):
+        yield next(domains)
 
 def top_k(domains, 
           n: int,
-          window_sz: int,
+          w: int,
           k: int,
           threshold: float=0.70) -> list[str]:
-    """Return top k scores from each window
+    """Scores top k domains per window
 
     Positional Arguments:
-    domains     -- list of domains we are computing edit distance scores on
     domains     -- generator object of domains
     k           -- amount of maximum scores to store per window
-    window_sz  -- size of window
+    w           -- size of window
 
     Keyword Arguments:
     threshold -- minimum score to keep per window
 
     Returns:
-    top k domains from each sliding window
+    list of top k domains
     """
-    # n = len(domains)
-    n = n
 
-    if (window_sz > n):
-        print(f"ERROR: window length > domain list length ({window_sz} > "
-                                                         f"{n})")
-        exit(1)
-    # if (k >= window_sz):
-    #     print(f"ERROR: k >= window length ({k} >= {window_sz})")
-    #     exit(1)
+    n_procs = int(os.cpu_count() / 2)
+    n_processed = 0
+    
+    # log actions
+    print(f"# domains: {n}")
 
     global_max = []
+    with mp.Pool(processes=n_procs) as pool:
+        # window_scores = mp.Queue(maxsize=n_uniq)
+        for i in range(0, n, w):
+            assert w <= n, f"window length > # total domains: ({w} > {n})"
 
-    # print("Begin top-k computation:\n"
-    #       f"  # domains = {n}\n"
-    #       f"  k = {k}\n"
-    #       f"  window size = {window_sz}\n"
-    #       f"  threshold = {threshold}")
+            if n_processed + w > n:
+                w = n - n_processed
+                k = math.ceil(0.5*w)
 
-    mttf = []
-    n_windows = math.ceil(n / window_sz)
-    n_processed = 0
+            n_uniq = int(w * (w - 1) / 2)
+            window_scores = np.empty(n_uniq, dtype=np.float32) 
 
-    for i in range(0, n, window_sz):
-        # window = domains[i:i+window_sz]
+            print(f"  window size: {w}\n"
+                  f"  unique_pairs: {n_uniq}\n"
+                  f"  k: {k}")
 
-        # bounds check
-        if n_processed + window_sz > n:
-            print(f"computing on window {i}\n"
-                  f"  n = {n}\n"
-                  f"  window size = {window_sz}\n"
-                  f"  domains processed = {n_processed}\n"
-                  f"  adjusting window size to {n - n_processed}\n"
-                  f"  adjusting k to {int(0.5*(n - n_processed))}")
-            window_sz = n - n_processed
-            k = int(0.5*window_sz)
+            window = construct_window(domains, w)
+            unique_pairs = list(combinations(window, r=2))
 
-        window = []
-        for w in range(window_sz):
-            window.append(next(domains))
+            scores = pool.imap(score, unique_pairs)
+            for j in range(n_uniq):
+                window_scores[j] = next(scores)
 
-        alg_response = pairs(window, threshold)
-        mttf.append(alg_response.time_elapsed)
+            k_top = np.argpartition(window_scores, -k)
+            for idx in k_top[-k:]:
+                global_max.append(unique_pairs[idx])
 
-        local_max_len = int((window_sz*(window_sz - 1)) / 2)
-        local_max = np.full(local_max_len, -1.0, dtype=np.float32)
+            n_processed += w
 
-        for j in range(len(alg_response.data)):
-            local_max[j]  = alg_response.data[j][2]
-
-        idx = np.argpartition(local_max, -k)
-        for id in idx[-k:]:
-            # return only non-negative max scores
-            if local_max[id] > 0:
-                global_max.append(alg_response.data[id])
-
-        n_processed += window_sz
-
-        # window_sz += 1
-
-    sum = 0
-    for ttf in mttf:
-        sum += ttf
-    mean = sum / n_windows
-
-    return (global_max, mean)
+    return global_max 
 
 def my_min(*args) -> int:
     """Utility function to compute the min of a variable amount of arguments
@@ -224,16 +171,28 @@ def reconstruct(E: np.ndarray, X: str, Y: str) -> list[str]:
 
     return L
 
-def scoring(ed: int, max_ed: int) -> float:
+# def scoring(ed: int, max_ed: int) -> float:
+def scoring(X: str, Y: str) -> float:
     """Compute the score of an edit distance metric
 
     Arguments:
     ed      -- edit distance
     max_ed  -- max edit distance A.K.A length of longest string in computing ed
     """
+    # if ed == 0:
+    #     return 1.0
+    # return 1 - (ed / float(max_ed))
+
+    len_X = len(X)
+    len_Y = len(Y)
+
+    max_len = len_X if len_X > len_Y else len_Y
+    ed = edit_distance(X, Y)
+
     if ed == 0:
         return 1.0
-    return 1 - (ed / float(max_ed))
+
+    return round(1 - (ed / float(max_len)), 3)
 
 def fetch_lines(fn: str):
     result = []
