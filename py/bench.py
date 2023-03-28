@@ -10,7 +10,6 @@ from util import fetch_lines
 if __name__ == "__main__":
     n = 1000
     threshold = 0.70
-    
     start = 10
     end = 101
     step = 10
@@ -47,4 +46,3 @@ if __name__ == "__main__":
 
     print("Plot is shown")
     plt.show()
-
