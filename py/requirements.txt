@@ -1,5 +1,6 @@
-numpy
 jedi-language-server
 pynvim
+numpy
 tqdm
 matplotlib
+pylint
