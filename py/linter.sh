@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-DICT=./words_alpha.txt
+DICT=../data/words_alpha.txt
 
 for file in `find . -maxdepth 1 -type f -name '*.py'` ; do
     echo "[+] Linting $file"
