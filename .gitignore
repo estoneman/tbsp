@@ -1,8 +1,6 @@
 tex/
 img/
 py/.virtualenv
-.scsv
-main
-domains.in
 py/__*
 old_c/
+data/
