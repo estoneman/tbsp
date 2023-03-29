@@ -30,5 +30,10 @@ def take(iterable, size):
             "TypeError: iterable must be a generator object" \
             f", got {type(iterable)}"
 
-    for _ in range(size):
-        yield next(iterable)
+    cnt = 0
+    for elem in iterable:
+        if cnt > size:
+            break
+
+        yield elem
+        cnt += 1
