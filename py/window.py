@@ -19,6 +19,8 @@ def adjust_window(w: int, k: int, n: int, n_processed: int) -> int:
     k           -- current amount of domains to store per window
     n           -- total number of domains
     n_processed -- total number of domains already read
+
+    Returns updated w and k
     """
     if n_processed + w > n:
         w = n - n_processed
