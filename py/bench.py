@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-import window
+import top_k 
 from util import fetch_lines
 
 if __name__ == "__main__":
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         t1 = time.clock_gettime_ns(time.CLOCK_REALTIME)
 
         print(f"scale: {int(xs[i] / STEP)*10}%")
-        top_k = window.top_k(domain_list, n, window_len, k, THRESHOLD)
+        top = top_k.top_k(domain_list, n, window_len, k, THRESHOLD)
 
         t2 = time.clock_gettime_ns(time.CLOCK_REALTIME)
 
