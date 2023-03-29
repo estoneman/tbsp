@@ -11,18 +11,33 @@ import numpy as np
 import edit_distance
 import util
 
+def adjust_window(w: int, k: int, n: int, n_processed: int) -> int:
+    """Window size check (TODO: scale window)
+
+    Positional Arguments:
+    w           -- current window size
+    k           -- current amount of domains to store per window
+    n           -- total number of domains
+    n_processed -- total number of domains already read
+    """
+    if n_processed + w > n:
+        w = n - n_processed
+        k = math.ceil(0.5*w)
+
+    return (w,k)
+
 def top_k(domains,
-          n_domains: int,
-          window_size: int,
+          n: int,
+          w: int,
           k: int,
           threshold: float=0.70) -> list[str]:
     """Scores top k domains per window
 
     Positional Arguments:
     domains     -- input domains
-    n_domains   -- total input domains
+    n   -- total input domains
     k           -- number of maximum scores to store per window
-    window_size -- size of window
+    w -- size of window
 
     Keyword Arguments:
     threshold -- minimum score to keep per window
@@ -37,23 +52,21 @@ def top_k(domains,
     global_max = []
     with mp.Pool(processes=n_procs) as pool:
         current_window = 1
-        for _ in range(0, n_domains, window_size):
-            assert window_size <= n_domains, \
+        for _ in range(0, n, w):
+            assert w <= n, \
                    "window length > # total domains:" \
-                   f"({window_size} > {n_domains})"
-            assert k <= window_size, f"k > window length: ({k} > {window_size})"
+                   f"({w} > {n})"
+            assert k <= w, f"k > window length: ({k} > {w})"
 
-            if n_processed + window_size > n_domains:
-                window_size = n_domains - n_processed
-                k = math.ceil(0.5*window_size)
+            w,k = adjust_window(w, k, n, n_processed)
 
-            n_uniq = int(window_size * (window_size - 1) / 2)
+            n_uniq = int(w * (w - 1) / 2)
             window_scores = np.empty(n_uniq, dtype=np.float32)
 
             print(f"  current window: {current_window}\n"
-                  f"    window size: {window_size}")
+                  f"    window size: {w}")
 
-            window = util.take(domains, window_size)
+            window = util.take(domains, w)
             unique_pairs = list(combinations(window, r=2))
 
             scores = pool.imap(edit_distance.score, unique_pairs)
@@ -66,7 +79,7 @@ def top_k(domains,
             for idx in k_top[-k:]:
                 global_max.append(unique_pairs[idx])
 
-            n_processed += window_size
+            n_processed += w
             current_window += 1
 
     return global_max
