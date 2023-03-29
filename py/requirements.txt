@@ -1,6 +1,9 @@
-jedi-language-server
-pynvim
+# required
 numpy
-tqdm
 matplotlib
 pylint
+
+# optional
+jedi-language-server
+pynvim
+tqdm
