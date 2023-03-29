@@ -1,3 +1,6 @@
+"""Visualize performance of sliding windows implementation
+"""
+
 import math
 import time
 
