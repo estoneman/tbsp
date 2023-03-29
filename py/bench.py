@@ -1,18 +1,17 @@
 """Visualize performance of sliding windows implementation
 """
 
-import math
 import time
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 
-import top_k 
+import top_k
 from util import fetch_lines
 
 if __name__ == "__main__":
-    n = 100
+    n = 1000
     THRESHOLD = 0.70
     START = 10
     END = 101
@@ -25,12 +24,10 @@ if __name__ == "__main__":
         domain_list = fetch_lines("../data/domains.in")
         window_len = int(n * (xs[i]/100))
 
-        k = math.ceil(0.5*window_len)
-
         t1 = time.clock_gettime_ns(time.CLOCK_REALTIME)
 
         print(f"scale: {int(xs[i] / STEP)*10}%")
-        top = top_k.top_k(domain_list, n, window_len, k, THRESHOLD)
+        top = top_k.top_k(domain_list, n, window_len, THRESHOLD)
 
         t2 = time.clock_gettime_ns(time.CLOCK_REALTIME)
 
