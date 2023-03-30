@@ -2,6 +2,7 @@ tex/
 img/
 py/.virtualenv
 py/__*
+py/cy*
 data/
 TODO*
 OLD*
