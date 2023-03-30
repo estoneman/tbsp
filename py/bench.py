@@ -11,7 +11,7 @@ import top_k
 from util import fetch_lines
 
 if __name__ == "__main__":
-    n = 1000
+    n = 100
     THRESHOLD = 0.70
     START = 10
     END = 101

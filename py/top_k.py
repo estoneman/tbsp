@@ -38,7 +38,7 @@ def top_k(domains,
 
     global_max = []
     with mp.Pool(processes=n_procs) as pool:
-        for _ in range(0, n, w):
+        for _ in range(0, n, window.get_size()):
             assert window.get_size() <= n, \
                    "window length > # total domains:" \
                    f"({window.get_size()} > {n})"
@@ -70,7 +70,7 @@ def top_k(domains,
             n_processed += window.get_size()
             request = window.get_size() << 1
             window.slide(domains, n, n_processed, request)
-            if window.get_size() == 0:
-                break
+            # if window.get_size() == 0:
+            #     break
 
     return global_max
