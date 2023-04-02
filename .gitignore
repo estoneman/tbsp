@@ -1,8 +1,16 @@
-tex/
+# folders
+data/
 img/
 py/.virtualenv
 py/__*
+py/build
 py/cy*
-data/
-TODO*
 OLD*
+tex/
+TODO*
+UNUSED*
+
+# files
+py/*.c
+py/*.html
+py/*.so
