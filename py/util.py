@@ -12,7 +12,7 @@ def fetch_lines(file_path: str):
     Returns:
     Generator of a files' lines
     """
-    with open(file_path, mode="r", encoding="utf-8") as infile:
+    with open(file_path, mode="rb", encoding="utf-8") as infile:
         for line in infile:
             yield line.strip()
 
@@ -32,7 +32,7 @@ def take(iterable, size):
 
     cnt = 0
     for elem in iterable:
-        if cnt > size:
+        if cnt == size:
             break
 
         yield elem
