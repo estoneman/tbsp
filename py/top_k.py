@@ -37,40 +37,40 @@ def top_k(domains,
     window = SlidingWindow(domains, w)
 
     global_max = []
-    with mp.Pool(processes=n_procs) as pool:
-        for _ in range(0, n, window.get_size()):
-            assert window.get_size() <= n, \
-                   "window length > # total domains:" \
-                   f"({window.get_size()} > {n})"
-            assert window.get_k() <= window.get_size(), \
-                   "k > window length: " \
-                   f"({window.get_k()} > {window.get_size()})"
+    # with mp.Pool(processes=n_procs) as pool:
+    for _ in range(0, n, window.get_size()):
+        assert window.get_size() <= n, \
+               "window length > # total domains:" \
+               f"({window.get_size()} > {n})"
+        assert window.get_k() <= window.get_size(), \
+               "k > window length: " \
+               f"({window.get_k()} > {window.get_size()})"
 
-            current_window += 1
+        current_window += 1
 
-            n_uniq = int(window.get_size() * (window.get_size() + 1) / 2)
-            window_scores = np.full(n_uniq, -1, dtype=np.float32)
+        n_uniq = int(window.get_size() * (window.get_size() - 1) / 2)
+        window_scores = np.full(n_uniq, -1, dtype=np.float32)
 
-            print(f"  current window: {current_window}\n"
-                  f"    window size: {window.get_size()}")
+        print(f"  current window: {current_window}\n"
+              f"    window size: {window.get_size()}")
 
-            unique_pairs = list(combinations(window.get_data(), r=2))
-            scores = pool.imap(edit_distance.score, unique_pairs)
+        unique_pairs = combinations(window.get_data(), r=2)
+        for pair in unique_pairs:
+            edit_distance.score_pair(pair)
+        # for i in range(n_uniq):
+        #     current_score = next(scores)
+        #     if current_score > threshold:
+        #         window_scores[i] = current_score 
 
-            for i in range(n_uniq):
-                current_score = next(scores)
-                if current_score > threshold:
-                    window_scores[i] = current_score
+        k_top = np.argpartition(window_scores, window.get_k()*-1)
+        for idx in k_top[window.get_k()*-1:]:
+            if window_scores[idx] > 0:
+                global_max.append(unique_pairs[idx])
 
-            k_top = np.argpartition(window_scores, window.get_k()*-1)
-            for idx in k_top[window.get_k()*-1:]:
-                if window_scores[idx] > 0:
-                    global_max.append(unique_pairs[idx])
-
-            n_processed += window.get_size()
-            request = window.get_size() << 1
-            window.slide(domains, n, n_processed, request)
-            # if window.get_size() == 0:
-            #     break
+        n_processed += window.get_size()
+        request = window.get_size() << 1
+        window.slide(domains, n, n_processed, request)
+        # if window.get_size() == 0:
+        #     break
 
     return global_max
