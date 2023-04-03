@@ -8,11 +8,11 @@ import util
 
 class SlidingWindow:
     """Discrete type of data structure for processing large sets of data"""
-    def __init__(self, corpus, size):
+    def __init__(self, corpus, size, k):
         """Non-default constructor of a SlidingWindow"""
         self.data = util.take(corpus, size)
         self.size = size
-        self.k = math.ceil(0.5*self.get_size())
+        self.k = k
 
     def set_data(self, data):
         """Setter"""
@@ -54,7 +54,7 @@ class SlidingWindow:
         else:
             self.set_size(requested)
 
-        self.set_k(math.ceil(0.5 * self.get_size()))
+        # self.set_k(math.ceil(0.5 * self.get_size()))
 
     def slide(self, corpus, n, n_processed, requested):
         """Move window given an amount to advance by
