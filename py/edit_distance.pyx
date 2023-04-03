@@ -49,12 +49,12 @@ cdef float score(unsigned int distance, unsigned int max_distance):
     
     return 1 - (distance / float(max_distance))
 
-cpdef float score_pair(StrPair pair):
+cpdef (StrPair, float) score_pair(StrPair pair):
     len_f0 = strlen(pair[0])
     len_f1 = strlen(pair[1])
 
     max_len = len_f0 if len_f0 > len_f1 else len_f1
     distance = edit_distance(pair[0], pair[1])
 
-    return score(distance, max_len)
+    return (pair, score(distance, max_len))
 
