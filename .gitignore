@@ -14,3 +14,4 @@ UNUSED*
 py/*.c
 py/*.html
 py/*.so
+*.zip
