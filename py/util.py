@@ -2,6 +2,7 @@
 """
 
 from types import GeneratorType
+from math import exp
 
 def fetch_lines(file_path: str):
     """Read a file line by line
@@ -37,3 +38,6 @@ def take(iterable, size):
 
         yield elem
         cnt += 1
+
+def sigmoid(x) -> float:
+    return 1 / float(1 + exp(-x))
