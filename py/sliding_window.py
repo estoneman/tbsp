@@ -38,7 +38,7 @@ class SlidingWindow:
         """Getter"""
         return self.k
 
-    def bound(self, n, n_processed, requested):
+    def bound(self, n, n_processed, request):
         """Ensure proper access of corpus data
 
         Positional Arguments:
@@ -49,21 +49,22 @@ class SlidingWindow:
         Returns:
         None
         """
-        if n_processed + requested > n:
+        if n_processed + request > n:
             self.set_size(n - n_processed)
         else:
-            self.set_size(requested)
-
+            self.set_size(self.get_size() + request)
         # self.set_k(math.ceil(0.5 * self.get_size()))
 
-    def slide(self, corpus, n, n_processed, requested):
+    def slide(self, corpus, n, n_processed, elapsed):
         """Move window given an amount to advance by
 
         Positional Arguments:
         corpus      -- original data to read from
         n           -- total amount of data in corpus
         n_processed -- total amount of data read so far
-        requested   -- total amount of data requested to be read
+        elapsed     -- total amount of time to compute current window
         """
-        self.bound(n, n_processed, requested)
+        # request = int(self.get_size() * math.exp(elapsed))
+        request = int(self.get_size() * util.sigmoid(-elapsed + 3))
+        self.bound(n, n_processed, request)
         self.set_data(util.take(corpus, self.get_size()))
