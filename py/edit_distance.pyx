@@ -16,7 +16,7 @@ cdef unsigned int edit_distance(char* src, char* dst):
         return src_len
 
     cdef unsigned int E[E_CAP]
-    memset(E, 0, E_CAP)
+    memset(E, 0, E_CAP * sizeof(unsigned int))
 
     cdef Py_ssize_t i = 0
     cdef Py_ssize_t j = 0
