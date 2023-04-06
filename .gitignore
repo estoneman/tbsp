@@ -10,8 +10,9 @@ tex/
 sandbox/
 
 # files
+DEPREC*
 TODO*
-UNUSED*
+USEME*
 py/*.c
 py/*.html
 py/*.so
