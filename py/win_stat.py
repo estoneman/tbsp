@@ -44,20 +44,19 @@ def stats_main(pair_scores: dict,
     """Main entry point for statistic computing
 
     Positional Arguments:
-    domains     -- window of domains
+    pair_scores -- list of tuples of the form:
+                   (("word1", "word2"), score)         
     flags       -- which stats to compute (bitwise OR format)
                    e.g. (TOP_K | MIN | STD_DEV)
 
     Returns:
     list of populated `Statistic` objects
-
     """
     top_k_scores = {}
     idx = 0
     for pair_score in pair_scores:
         top_k_scores[idx] = (pair_score[0], round(pair_score[1], 3))
         idx += 1
-
 
     scores = [pair[1] for pair in top_k_scores.values()]
     len_scores = len(scores)
