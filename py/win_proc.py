@@ -93,9 +93,7 @@ def process_windows(domains,
         print("    END worker")
         print("    START stats_main")
         stats = stats_main(pair_scores,
-                           n_uniq,
-                           stat_flags,
-                           current_window)
+                           stat_flags)
 
         n_processed += window.get_size()
         elapsed = round((end - start) / float(10e9), 3)
