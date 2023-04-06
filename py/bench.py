@@ -35,7 +35,7 @@ def main():
         t1 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
 
         print(f"scale: {int(xs[i] / STEP)*10}%")
-        top = win_proc.process_windows(domains, n, window_len,
+        top = win_proc.process_windows(domain_list, n, window_len,
                                        THRESHOLD, FLAGS)
 
         t2 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
