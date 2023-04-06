@@ -4,15 +4,14 @@ implementation
 
 import math
 
-import util
+import win_util
 
 class SlidingWindow:
     """Discrete type of data structure for processing large sets of data"""
-    def __init__(self, corpus, size, k):
+    def __init__(self, corpus, size):
         """Non-default constructor of a SlidingWindow"""
-        self.data = util.take(corpus, size)
+        self.data = win_util.take(corpus, size)
         self.size = size
-        self.k = k
 
     def set_data(self, data):
         """Setter"""
@@ -22,10 +21,6 @@ class SlidingWindow:
         """Setter"""
         self.size = size
 
-    def set_k(self, k):
-        """Setter"""
-        self.k = k
-
     def get_data(self):
         """Getter"""
         return self.data
@@ -34,11 +29,7 @@ class SlidingWindow:
         """Getter"""
         return self.size
 
-    def get_k(self):
-        """Getter"""
-        return self.k
-
-    def bound(self, n, n_processed, request):
+    def resize(self, n, n_processed, request):
         """Ensure proper access of corpus data
 
         Positional Arguments:
@@ -53,7 +44,6 @@ class SlidingWindow:
             self.set_size(n - n_processed)
         else:
             self.set_size(self.get_size() + request)
-        # self.set_k(math.ceil(0.5 * self.get_size()))
 
     def slide(self, corpus, n, n_processed, elapsed):
         """Move window given an amount to advance by
@@ -64,7 +54,9 @@ class SlidingWindow:
         n_processed -- total amount of data read so far
         elapsed     -- total amount of time to compute current window
         """
-        # request = int(self.get_size() * math.exp(elapsed))
-        request = int(self.get_size() * util.sigmoid(-elapsed + 3))
-        self.bound(n, n_processed, request)
-        self.set_data(util.take(corpus, self.get_size()))
+        request = int(self.get_size() * math.exp(elapsed))
+        # request = self.get_size() + \
+        #           int(self.get_size() * win_util.sigmoid(-elapsed + 6))
+
+        self.resize(n, n_processed, request)
+        self.set_data(win_util.take(corpus, self.get_size()))
