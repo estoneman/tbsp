@@ -3,14 +3,15 @@ data/
 img/
 py/.virtualenv
 py/__*
-py/build
+py/build/
 py/cy*
 OLD*
 tex/
-TODO*
-UNUSED*
+sandbox/
 
 # files
+TODO*
+UNUSED*
 py/*.c
 py/*.html
 py/*.so
