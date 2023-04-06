@@ -12,7 +12,6 @@
 # install dependencies
 > python -m pip install -r requirements.txt
 
-# run module
-> python main.py
+# run module COMING SOON
 ```
 
