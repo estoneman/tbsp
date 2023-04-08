@@ -6,7 +6,7 @@ DEF E_CAP = 16384
 
 ctypedef (char*, char*) StrPair
 
-cdef unsigned int edit_distance(char* src, char* dst):
+cpdef unsigned int edit_distance(char* src, char* dst):
     cdef Py_ssize_t src_len = strlen(src)
     cdef Py_ssize_t dst_len = strlen(dst)
 
@@ -21,26 +21,27 @@ cdef unsigned int edit_distance(char* src, char* dst):
     cdef Py_ssize_t i = 0
     cdef Py_ssize_t j = 0
 
-    for i in range(src_len + 1):
-        E[(i*src_len)] = i
     for i in range(dst_len + 1):
         E[i] = i
-    
+
+    for i in range(src_len + 1):
+        E[i*(dst_len + 1)] = i
+
     cdef unsigned int a, b, c
     for i in range(1, src_len + 1):
         for j in range(1, dst_len + 1):
             # delete
-            a = E[((i - 1)*src_len) + j] + 1
+            a = E[((i - 1) * (dst_len + 1)) + j] + 1
             # insertion
-            b = E[(i*src_len) + (j - 1)] + 1
+            b = E[(i * (dst_len + 1)) + (j - 1)] + 1
             # substitution
-            c = E[((i - 1)*src_len) + (j - 1)]
+            c = E[((i - 1) * (dst_len + 1)) + (j - 1)]
             if src[i - 1] != dst[j - 1]:
                 c += 1
 
-            E[(i * src_len) + j] = min(a, b, c)
+            E[(i * (dst_len + 1)) + j] = min(a, b, c)
 
-    return E[(src_len)*(src_len) + (dst_len)]
+    return E[(src_len)*(dst_len + 1) + (dst_len)]
 
 @cython.cdivision(True)
 cdef float score(unsigned int distance, unsigned int max_distance):
