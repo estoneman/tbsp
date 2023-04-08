@@ -4,6 +4,19 @@
 from math import exp
 from types import GeneratorType
 
+def remove_tld(d: str) -> str:
+    d_len = len(d)
+    r = d_len - 1
+    sub_d = list(d)
+
+    while d[r] != ".":
+        sub_d.pop()
+        r -= 1
+
+    sub_d.pop() # for that pesky period
+
+    return "".join(sub_d)
+
 def fetch_lines(file_path: str):
     """Read a file line by line
 
@@ -13,9 +26,9 @@ def fetch_lines(file_path: str):
     Returns:
     Generator of a files' lines
     """
-    with open(file_path, mode="rb") as infile:
+    with open(file_path, mode="r") as infile:
         for line in infile:
-            yield line.strip()
+            yield remove_tld(line).encode("utf-8")
 
 def take(iterable, size):
     """Build a window with specified size
