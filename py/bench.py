@@ -12,8 +12,8 @@ from win_util import fetch_lines
 from win_stat import StatType
 
 def main():
-    n = 1744
-    THRESHOLD = 0.90
+    n = 1000
+    THRESHOLD = 0.750
     START = 10
     END = 101
     STEP = 10
@@ -42,25 +42,26 @@ def main():
 
         ys[i] = round((t2 - t1) / 10e9, 3)
         print(f"  ttc: {ys[i]} seconds")
-        print(top)
 
-    plt.figure(1)
+    PLOT=True
+    if PLOT:
+        plt.figure(1)
 
-    plt.title(f"Sliding Window @ {n=} Domains")
-    plt.xlabel("window size (% domain size)")
-    plt.ylabel("time (s)")
+        plt.title(f"Sliding Window @ {n=} Domains")
+        plt.xlabel("window size (% domain size)")
+        plt.ylabel("time (s)")
 
-    plt.xticks(xs)
+        plt.xticks(xs)
 
-    plt.plot(xs, ys, color=mcolors.BASE_COLORS["k"])
-    marker, stemlines, baseline = plt.stem(xs, ys)
-    plt.setp(marker, "color", "grey")
-    plt.setp(stemlines, "color", "grey")
-    plt.setp(stemlines, "linestyle", "dotted")
-    plt.setp(baseline, "color", "grey")
+        plt.plot(xs, ys, color=mcolors.BASE_COLORS["k"])
+        marker, stemlines, baseline = plt.stem(xs, ys)
+        plt.setp(marker, "color", "grey")
+        plt.setp(stemlines, "color", "grey")
+        plt.setp(stemlines, "linestyle", "dotted")
+        plt.setp(baseline, "color", "grey")
 
-    print("Plot is shown")
-    plt.show()
+        print("Plot is shown")
+        plt.show()
 
 if __name__ == "__main__":
     main()
