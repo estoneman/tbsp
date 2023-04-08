@@ -8,7 +8,7 @@ import time
 
 import edit_distance
 from sliding_window import SlidingWindow
-from win_stat import stats_main
+from win_stat import StatType
 
 def work(function, data, size, n_procs, threshold=0.70):
     """Multiprocessed helper for scoring pairs of domains
@@ -49,7 +49,7 @@ def process_windows(domains,
                     n: int,
                     w: int,
                     threshold: int,
-                    stat_flags: int) -> None:
+                    flags: int) -> None:
     """Scores top k domains per window
 
     Positional Arguments:
@@ -57,7 +57,7 @@ def process_windows(domains,
     n           -- total input domains
     w           -- size of window
     threshold   -- minimum score to keep
-    stat_flags  -- window statistics flags, see `util.py` for list of supported
+    flags  -- window statistics flags, see `util.py` for list of supported
                    statistics
 
     Returns:
@@ -92,8 +92,61 @@ def process_windows(domains,
 
         print("    END worker")
         print("    START stats_main")
-        stats = stats_main(pair_scores,
-                           stat_flags)
+        top_k_scores = {}
+        idx = 0
+        for pair_score in pair_scores:
+            top_k_scores[idx] = (pair_score[0], round(pair_score[1], 3))
+            idx += 1
+
+        scores = [pair[1] for pair in top_k_scores.values()]
+        len_scores = len(scores)
+
+        stats_list = []
+        if flags & StatType.TOP_K.value != 0:
+            locs = window.top_k(scores)
+
+            data = []
+            for loc in locs:
+                data.append(top_k_scores[loc])
+
+            stats_list.append(data)
+        if flags & StatType.MEAN.value != 0:
+            print("StatType.MEAN unimplemented")
+            stats_list.append(None)
+        if flags & StatType.MAX.value != 0:
+            if len_scores == 0:
+                print("\x1b[33m" + "="*6)
+                print("Warning: `max` stat not computed. Either the\n"
+                      "current window is empty or the threshold filtered all\n"
+                      "scores")
+                print("\x1b[0m")
+            elif len_scores == 1:
+                stats_list.append(top_k_scores[0])
+            else:
+                loc = window.max(scores)
+                data = top_k_scores[loc]
+
+                stats_list.append(data)
+        if flags & StatType.MIN.value != 0:
+            if len_scores == 0:
+                print("\x1b[33m" + "="*6)
+                print("Warning: `min` stat not computed. Either the current\n"
+                      "window is empty or the threshold filtered all scores")
+                print("="*6 + "\x1b[0m")
+            elif len_scores == 1:
+                stats_list.append(top_k_scores[0])
+            else:
+                loc = window.min(scores)
+                data = top_k_scores[loc]
+
+                stats_list.append(data)
+        if flags & StatType.STD_DEV.value != 0:
+            print("StatType.STD_DEV unimplemented")
+            stats_list.append(None)
+
+        for stat in stats_list:
+            if stat is not None:
+                print(stat)
 
         n_processed += window.get_size()
         elapsed = round((end - start) / float(10e9), 3)
@@ -104,6 +157,5 @@ def process_windows(domains,
         if window.get_size() > 0:
             print(f"    next window size: {window.get_size()}")
 
-        print([stat.get_data() for stat in stats if stat is not None])
 
     print("END OF DATA")
