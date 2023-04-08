@@ -4,6 +4,8 @@ implementation
 
 import math
 
+import numpy as np
+
 import win_util
 
 class SlidingWindow:
@@ -60,3 +62,21 @@ class SlidingWindow:
 
         self.resize(n, n_processed, request)
         self.set_data(win_util.take(corpus, self.get_size()))
+
+    def top_k(self, scores, k: int=5):
+        """top k scores from window"""
+        num_scores = len(scores)
+        if num_scores < k:
+            k = num_scores
+        k_top = np.argpartition(scores, -k)
+
+        return k_top[-k:]
+
+    def min(self, scores):
+        """minimum score from window"""
+        return np.argpartition(scores, 1)[0]
+    
+    def max(self, scores):
+        """maximum score from window"""
+        # return top_k(scores, 1)
+        return np.argpartition(scores, -1)[-1]
