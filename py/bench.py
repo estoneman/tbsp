@@ -1,4 +1,5 @@
-"""Visualize performance of sliding windows implementation
+"""Visualize runtime performance of sliding windows implementation w/ varying
+window sizes
 """
 
 import time
@@ -12,7 +13,7 @@ from win_util import fetch_lines
 from win_stat import StatType
 
 def main():
-    n = 1000
+    n = 1744
     THRESHOLD = 0.750
     START = 10
     END = 101
@@ -23,9 +24,6 @@ def main():
 
     for i in range(xs.shape[0]):
         domain_list = fetch_lines("../data/domains.in")
-        # domain_list = fetch_lines(
-        #         "/usr/local/opt/wordlists/rockyou/rockyou.txt"
-        # )
         window_len = int(n * (xs[i]/100))
         k = 5
         FLAGS = StatType.MAX.value | \
@@ -34,14 +32,13 @@ def main():
 
         t1 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
 
-        print(f"scale: {int(xs[i] / STEP)*10}%")
+        print(f"[+] scale: {int(xs[i] / STEP)*10}%")
         top = win_proc.process_windows(domain_list, n, window_len,
                                        THRESHOLD, FLAGS)
 
         t2 = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
 
         ys[i] = round((t2 - t1) / 10e9, 3)
-        print(f"  ttc: {ys[i]} seconds")
 
     PLOT=True
     if PLOT:
