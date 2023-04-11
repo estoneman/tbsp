@@ -1,10 +1,15 @@
-"""Various helper functions for topk computation
-"""
+"""Various helper functions for topk computation"""
+
+import sys
 
 from math import exp
-from types import GeneratorType
 
 def remove_tld(d: str) -> str:
+    """Remove the TLD from a domain
+
+    Positional Arguments:
+    d -- domain to be stripped
+    """
     d_len = len(d)
     r = d_len - 1
     sub_d = list(d)
@@ -26,9 +31,24 @@ def fetch_lines(file_path: str):
     Returns:
     Generator of a files' lines
     """
-    with open(file_path, mode="r") as infile:
+    with open(file_path, mode="r", encoding="utf-8") as infile:
         for line in infile:
             yield remove_tld(line).encode("utf-8")
+
+def is_iterable(iterable):
+    """Check whether a sequence of data can be iterated
+    
+    Positional Arguments:
+    iterable -- collection to be judged as iterable or not
+
+    Returns:
+    bool
+    """
+    try:
+        iter(iterable)
+        return True
+    except TypeError:
+        return False
 
 def take(iterable, size):
     """Build a window with specified size
@@ -40,9 +60,9 @@ def take(iterable, size):
     Returns:
     subset of domain names
     """
-    assert isinstance(iterable, GeneratorType), \
-            "TypeError: iterable must be a generator object" \
-            f", got {type(iterable)}"
+    if not is_iterable(iterable):
+        print("passed object is not iterable. Aborting...")
+        sys.exit(1)
 
     cnt = 0
     for elem in iterable:
