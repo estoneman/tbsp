@@ -3,15 +3,16 @@ implementation
 """
 
 import math
+from statistics import fmean, stdev
 
 import numpy as np
 
 import win_util
 
 class SlidingWindow:
-    """Discrete type of data structure for processing large sets of data"""
+    """Discrete type for processing large sets of data"""
     def __init__(self, corpus, size):
-        """Non-default constructor of a SlidingWindow"""
+        """Non-default constructor"""
         self.data = win_util.take(corpus, size)
         self.size = size
 
@@ -75,8 +76,15 @@ class SlidingWindow:
     def min(self, scores):
         """minimum score from window"""
         return np.argpartition(scores, 1)[0]
-    
+
     def max(self, scores):
         """maximum score from window"""
-        # return top_k(scores, 1)
         return np.argpartition(scores, -1)[-1]
+
+    def mean(self, scores):
+        """average score"""
+        return fmean(scores)
+
+    def std_dev(self, scores):
+        """standard deviation of scores"""
+        return stdev(scores)
