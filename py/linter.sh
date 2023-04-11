@@ -6,7 +6,7 @@ MAX_LINE_LENGTH=80
 MIN_SIMILAR_LINES=1
 MAX_ARGS=6
 MAX_LOCALS=20
-GOOD_NAMES="i,j,k,n,w,x,Type,get_Type"
+GOOD_NAMES="d,i,j,k,n,r,w,x,y,Type,get_Type,THRESHOLD,START,FLAGS"
 PKG_ALLOW_LIST="edit_distance"
 
 if [[ ! -f $DICT ]] ; then
