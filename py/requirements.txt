@@ -7,4 +7,3 @@ scipy
 # optional
 jedi-language-server
 pynvim
-tqdm
