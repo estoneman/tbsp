@@ -1,5 +1,4 @@
 # folders
-data/
 img/
 py/.virtualenv
 py/__*
@@ -13,6 +12,7 @@ sandbox/
 DEPREC*
 TODO*
 USEME*
+^(?!.*(topk|words_alpha\.txt))
 py/*.c
 py/*.html
 py/*.so
