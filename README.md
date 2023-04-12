@@ -63,3 +63,6 @@ _NOTE_: I am working on Mac OSX Ventura 13.3.1. I believe everything should be
 fine creating the virtual environment (use Powershell script located in
 .virtualenv/bin/ for Windows). As for multiprocessing, it is cross platform. If
 you run into any issues, don't hesitate to contact me on Slack.
+
+Also, you may remove any of the requirements marked as optional. I kept those in
+there just in case you used neovim.
