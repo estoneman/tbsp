@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from edit_distance import edit_distance
 from sliding_window import SlidingWindow
 import win_util
 
@@ -177,6 +178,15 @@ class TestTbsp(unittest.TestCase):
         window.slide(corpus, n, n_processed, elapsed)
 
         self.assertEqual(window.get_size(), previous_size * 2)
+
+    def test_edit_distance(self):
+        subdomain1 = b"google"
+        subdomain2 = b"dns.google"
+
+        ed = edit_distance(subdomain1, subdomain2)
+
+        # add 4 characters to beginning of `subdomain1` to equal `subodmain2`
+        self.assertEqual(ed, 4)
 
 if __name__ == "__main__":
     unittest.main()
