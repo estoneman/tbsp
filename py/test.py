@@ -139,6 +139,19 @@ class TestTbsp(unittest.TestCase):
 
         self.assertEqual(int(window_std_dev), 3)
 
+    def test_sliding_window_top_k(self):
+        fn = "corpus.txt"
+        corpus = win_util.fetch_lines(fn)
+
+        n = 100
+        window_len = 10
+        window = SlidingWindow(corpus, window_len)
+
+        scores = range(10)
+        window_top_k = window.top_k(scores)
+
+        self.assertListEqual(list(window_top_k), list(range(5,10)))
+
     def test_sliding_window_resize(self):
         fn = "corpus.txt"
         corpus = win_util.fetch_lines(fn)
@@ -155,11 +168,24 @@ class TestTbsp(unittest.TestCase):
         window.resize(n, n_processed, request)
         self.assertEqual(window.get_size(), 0)
 
+    def test_sliding_window_slide(self):
+        fn = "corpus.txt"
+        corpus = win_util.fetch_lines(fn)
 
-    """
-    slide,
-    top_k
-    """
+        n = 100
+        window_len = 10
+        window = SlidingWindow(corpus, window_len)
+
+        # simulate we are at offset 20 from start of corpus
+        n_processed = 20
+
+        # suppose our last window took 0 seconds to compute
+        elapsed = 0
+
+        previous_size = window.get_size()
+        window.slide(corpus, n, n_processed, elapsed)
+
+        self.assertEqual(window.get_size(), previous_size * 2)
 
 if __name__ == "__main__":
     unittest.main()
