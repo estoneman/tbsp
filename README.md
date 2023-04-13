@@ -6,14 +6,19 @@
 In this work, I implemented a sliding windows approach to the domain similarity
 problem. My motivation behind this was that the current state of this
 functionality in HinDom is much too slow and I saw an opportunity to speed
-things up. Diving further, I used sliding windows along with Python's
-_multiprocessing_ module along with other past work on this subject (See
-REFERENCES for more detail). Not only do I return with a similarity matrix that
-covers a large portion of the input data, but I also have enabled a primitive
-interface for computing statistics per computed window. Namely, these are top k
-similarity scores, mean, min, max, and standard devation. Below, you will find
-two ways I have provided for you to see what my work does up to this point.
+things up. The scoring mechanism that I utilized was edit distance (see
+REFERENCES.md). Essentially, edit distance calculates how many character
+transformations it takes to transform one word into another. For example, if we
+want to transform "abc" into "abcd", we add "d" which gives us an edit distance
+of 1. The supported operations are add, substitute, and delete.
 
+Furthermore, I used sliding windows along with Python's _multiprocessing_ module 
+along with other past work on this subject (See REFERENCES for more detail). Not 
+only do I return with a similarity matrix that covers a large portion of the 
+input data, but I also have enabled a primitive interface for computing 
+statistics per computed window. Namely, these are top k similarity scores, mean, 
+min, max, and standard devation. Below, you will find two ways I have provided 
+for you to see what my work does up to this point.
 
 ### Setup
 
