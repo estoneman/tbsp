@@ -59,14 +59,14 @@ def process_windows(domains,
     n_processed = 0
 
     current_window = 1
-    window = SlidingWindow(domains, w)
+    window = SlidingWindow(domains, w, int(n / 4), int(n / 2))
 
     sim_mat = np.full((n,n), 0.000, dtype=np.float64)
 
     # === BEGIN WINDOW PROCESSING === #
     while n_processed < n:
         assert window.get_size() <= n, \
-               "window length > # total domains:" \
+               "window length > # total domains: " \
                f"({window.get_size()} > {n})"
 
         # === GENERATE UNIQUE PAIRS ===
@@ -175,7 +175,7 @@ def process_windows(domains,
             pair,score = pair_score
             x,y = (hash(pair[0]) % window.get_size()), \
                   (hash(pair[1]) % window.get_size())
-            # print(pair, x, y, score)
+
             sim_mat[x + n_processed,y + n_processed] = score
 
         # === PREPARE NEXT WINDOW ===
