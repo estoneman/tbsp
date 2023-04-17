@@ -13,7 +13,7 @@ from win_util import fetch_lines
 from win_stat import StatType
 
 def main():
-    n = 1744
+    n = 500
     THRESHOLD = 0.750
     START = 10
     END = 101
