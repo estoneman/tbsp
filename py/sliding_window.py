@@ -11,10 +11,12 @@ import win_util
 
 class SlidingWindow:
     """Discrete type for processing large sets of data"""
-    def __init__(self, corpus, size):
+    def __init__(self, corpus, size, minimum, maximum):
         """Non-default constructor"""
         self.data = win_util.take(corpus, size)
         self.size = size
+        self.minimum = minimum
+        self.maximum = maximum
 
     def set_data(self, data):
         """Setter"""
@@ -24,6 +26,14 @@ class SlidingWindow:
         """Setter"""
         self.size = size
 
+    def set_maximum(self, maximum):
+        """Setter"""
+        self.maximum = maximum
+
+    def set_minimum(self, minimum):
+        """Setter"""
+        self.minimum = minimum
+
     def get_data(self):
         """Getter"""
         return self.data
@@ -31,6 +41,14 @@ class SlidingWindow:
     def get_size(self):
         """Getter"""
         return self.size
+
+    def get_maximum(self):
+        """Getter"""
+        return self.maximum
+
+    def get_minimum(self):
+        """Getter"""
+        return self.minimum
 
     def resize(self, n, n_processed, request):
         """Ensure proper access of corpus data
@@ -43,10 +61,15 @@ class SlidingWindow:
         Returns:
         None
         """
-        if n_processed + request > n:
+        candidate_window = self.get_size() + request
+        if n_processed + candidate_window > n:
             self.set_size(n - n_processed)
+        elif candidate_window > self.get_maximum():
+            self.set_size(self.get_maximum())
+        elif candidate_window < self.get_minimum():
+            self.set_size(self.get_minimum())
         else:
-            self.set_size(self.get_size() + request)
+            self.set_size(candidate_window)
 
     def slide(self, corpus, n, n_processed, elapsed):
         """Move window given an amount to advance by
@@ -57,9 +80,9 @@ class SlidingWindow:
         n_processed -- total amount of data read so far
         elapsed     -- total amount of time to compute current window
         """
-        request = int(self.get_size() * math.exp(elapsed))
-        # request = self.get_size() + \
-        #           int(self.get_size() * win_util.sigmoid(-elapsed + 6))
+        # request = int(self.get_size() * math.exp(elapsed))
+        request = self.get_size() + \
+                  int(self.get_size() * win_util.sigmoid(elapsed))
 
         self.resize(n, n_processed, request)
         self.set_data(win_util.take(corpus, self.get_size()))
