@@ -1,5 +1,7 @@
 """Runner module for sliding windows implementation"""
 
+import time
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -11,16 +13,17 @@ def main():
     """Main method (for now) for testing sliding windows implementation"""
     n = 1744
     THRESHOLD = 0.000
-    START = 25
+    START = 50
 
-    domain_list = fetch_lines("../data/domains.in")
+    # domain_list = fetch_lines("../data/domains.in")
+    domain_list = fetch_lines("/usr/local/opt/wordlists/rockyou/rockyou.txt")
     window_len = int(n * (START/100))
     FLAGS = StatType.MAX.value | \
             StatType.MIN.value | \
             StatType.TOP_K.value | \
             StatType.MEAN.value | \
             StatType.STD_DEV.value
-
+    
     sim_mat = win_proc.process_windows(domain_list, n, window_len,
                                        THRESHOLD, FLAGS)
 
@@ -32,6 +35,8 @@ def main():
 
     plt.scatter(rows, cols, c=values)
     plt.title("Sliding Window Data Coverage")
+
+    print("PLOT IS SHOWN")
     plt.show()
 
 if __name__ == "__main__":
