@@ -33,32 +33,26 @@ class TestTbsp(unittest.TestCase):
     def test_take(self):
         xs = (x for x in range(100))
 
-        subset = list(win_util.take(xs, n))
-        self.assertEqual(len(subset), n)
+        m = 2
+        self.assertEqual(len(list(win_util.take(xs, m))), m)
 
     def test_remove_tld(self):
         domain = "dns1.google.com"
-        stripped = win_util.remove_tld(domain)
 
-        self.assertEqual(stripped, "dns1.google")
+        self.assertEqual(win_util.remove_tld(domain), "dns1.google")
 
     def test_is_iterable(self):
-        x = 10
-        is_it = win_util.is_iterable(x)
-
-        self.assertFalse(is_it)
+        self.assertFalse(win_util.is_iterable(10))
 
     def test_fetch_lines(self):
-        lines = list(win_util.fetch_lines(fn))
-
-        self.assertEqual(len(lines), n)
+        self.assertEqual(len(list(win_util.fetch_lines(fn))), n)
 
     def test_sliding_window_get_data(self):
         window_len = 6
 
         corpus = win_util.fetch_lines(fn)
 
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         self.assertListEqual(list(window.get_data()),
                              [b"google", b"nike", b"chat.openai",
                               b"colorado", b"www.thebikerack", b"flu"])
@@ -67,14 +61,14 @@ class TestTbsp(unittest.TestCase):
         window_len = 6
 
         corpus = win_util.fetch_lines(fn)
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         self.assertEqual(window.get_size(), window_len)
 
     def test_sliding_window_set_data(self):
         window_len = 6
 
         corpus = win_util.fetch_lines(fn)
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         previous_data = window.get_data()
         window.set_data([b"foo",b"bar"])
 
@@ -84,7 +78,7 @@ class TestTbsp(unittest.TestCase):
         window_len = 6
 
         corpus = win_util.fetch_lines(fn)
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         
         previous_size = window.get_size()
         window.set_size(1000)
@@ -97,7 +91,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
         
         # dummy window
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         window_max = window.max(scores)
 
         self.assertEqual(window_max, 5)
@@ -108,7 +102,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         # dummy window
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         window_min = window.min(scores)
 
         self.assertEqual(window_min, 0)
@@ -119,7 +113,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         # dummy window
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         window_mean = window.mean(scores)
 
         self.assertEqual(window_mean, sum(scores) / window_len)
@@ -130,7 +124,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         # dummy window
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         window_std_dev = round(window.std_dev(scores), 3)
 
         self.assertEqual(window_std_dev, 1.871)
@@ -139,7 +133,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         window_len = 6
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
 
         scores = range(window_len)
         window_top_k = window.top_k(scores)
@@ -151,7 +145,7 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         window_len = 6
-        window = SlidingWindow(corpus, window_len)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
         
         # simulate we are at end of last window
         n_processed = n
@@ -164,8 +158,8 @@ class TestTbsp(unittest.TestCase):
     def test_sliding_window_slide(self):
         corpus = win_util.fetch_lines(fn)
 
-        window_len = 6
-        window = SlidingWindow(corpus, window_len)
+        window_len = 3
+        window = SlidingWindow(corpus, window_len, 0, window_len * 2)
 
         # simulate we are at offset 4 from start of corpus
         #     i.e. the last window length + n_processed < 4
@@ -174,6 +168,7 @@ class TestTbsp(unittest.TestCase):
         # suppose our last window took 0 seconds to compute
         elapsed = 0
 
+        # window size should be doubled after the slide
         previous_size = window.get_size()
         window.slide(corpus, n, n_processed, elapsed)
 
