@@ -33,7 +33,7 @@ for you to see what my work does up to this point.
 #### Cython Compilation
 ```bash
 > cd py
-> ./compile_cython.sh
+> make -k build
 ```
 
 With these commands executed, all modules that I have written in Cython are
