@@ -11,14 +11,19 @@ def remove_tld(d: str) -> str:
     d -- domain to be stripped
     """
     d_len = len(d)
+
     r = d_len - 1
     sub_d = list(d)
 
-    while d[r] != ".":
-        sub_d.pop()
-        r -= 1
+    try:
+        while d[r] != ".":
+            sub_d.pop()
+            r -= 1
 
-    sub_d.pop() # for that pesky period
+        sub_d.pop() # for that pesky period
+    except IndexError as err:
+        # input does not have '.' and len > 0, so return as is
+        return d.strip()
 
     return "".join(sub_d)
 
@@ -82,3 +87,8 @@ def sigmoid(x) -> float:
     scaled version of input, `x`
     """
     return 1 / float(1 + exp(-x))
+
+def bounded_tanh(x):
+    x = max(min(x, maximum), minimum)
+    
+    return math.tanh(x)
