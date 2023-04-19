@@ -1,9 +1,0 @@
-# required
-numpy
-matplotlib
-pylint
-scipy
-
-# optional
-jedi-language-server
-pynvim
