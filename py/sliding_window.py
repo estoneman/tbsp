@@ -62,14 +62,15 @@ class SlidingWindow:
         None
         """
         candidate_window = self.get_size() + request
-        if n_processed + candidate_window > n:
-            self.set_size(n - n_processed)
-        elif candidate_window > self.get_maximum():
-            self.set_size(self.get_maximum())
+        if candidate_window > self.get_maximum():
+            candidate_window = self.get_maximum()
         elif candidate_window < self.get_minimum():
-            self.set_size(self.get_minimum())
-        else:
-            self.set_size(candidate_window)
+            candidate_window = self.get_minimum()
+
+        if n_processed + candidate_window > n:
+            candidate_window = n - n_processed
+
+        self.set_size(candidate_window)
 
     def slide(self, corpus, n, n_processed, elapsed):
         """Move window given an amount to advance by
