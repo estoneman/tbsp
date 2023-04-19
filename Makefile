@@ -20,6 +20,7 @@ clean:
 	@echo "Removing $(ARTIFACTS)"
 	@rm -rf $(ARTIFACTS)
 
+.PHONY: help
 help:
 	@echo "Valid targets: $(VALID_TARGETS)"
 
