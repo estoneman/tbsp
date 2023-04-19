@@ -13,6 +13,7 @@ sandbox/
 DEPREC*
 TODO*
 USEME*
+data/words_alpha.txt
 linter.sh
 py/data_coverage.py
 py/bench.py
