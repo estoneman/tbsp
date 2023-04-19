@@ -3,7 +3,7 @@ data/topk
 img/
 py/.virtualenv
 py/__*
-py/build/
+build/
 py/cy*
 OLD*
 tex/
