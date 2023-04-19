@@ -3,7 +3,6 @@ cython
 numpy
 matplotlib
 pylint
-scipy
 
 # optional
 jedi-language-server
