@@ -44,8 +44,6 @@ speeding up the most repetitive actions during runtime.
 
 ## Usage
 
-### Data Coverage
-
 ```bash
 > cd py
 > python main.py
