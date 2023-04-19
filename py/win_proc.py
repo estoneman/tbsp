@@ -38,7 +38,6 @@ def work(function, data, n_procs, threshold=0.70):
 
 def process_windows(domains,
                     n: int,
-                    w: int,
                     threshold: int,
                     flags: int) -> None:
     """Scores top k subdomains per window
@@ -46,7 +45,6 @@ def process_windows(domains,
     Positional Arguments:
     domains     -- input subdomains
     n           -- total input subdomains
-    w           -- size of window
     threshold   -- minimum score to keep
     flags       -- window statistics flags, see `util.py` for list of supported
                    statistics
@@ -59,9 +57,13 @@ def process_windows(domains,
     n_processed = 0
 
     current_window = 1
-    win_max = int(n * 0.60)
-    win_min = int(win_max / 2)
-    window = SlidingWindow(domains, w, win_min, win_max)
+
+    win_max = 1000
+    win_min = 600
+    if n <= win_max:
+        win_min = win_max = n
+
+    window = SlidingWindow(domains, win_min, win_min, win_max)
 
     sim_mat = np.full((n,n), 0.000, dtype=np.float64)
 
