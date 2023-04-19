@@ -1,5 +1,4 @@
 """Cython source builder"""
-import os
 import sys
 
 from setuptools import setup, Extension
