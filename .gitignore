@@ -13,6 +13,7 @@ sandbox/
 DEPREC*
 TODO*
 USEME*
+linter.sh
 py/data_coverage.py
 py/bench.py
 py/*.c
