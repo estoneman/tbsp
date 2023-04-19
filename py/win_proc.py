@@ -59,7 +59,9 @@ def process_windows(domains,
     n_processed = 0
 
     current_window = 1
-    window = SlidingWindow(domains, w, int(n / 4), int(n / 2))
+    win_max = int(n * 0.60)
+    win_min = int(win_max / 2)
+    window = SlidingWindow(domains, w, win_min, win_max)
 
     sim_mat = np.full((n,n), 0.000, dtype=np.float64)
 
