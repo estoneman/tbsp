@@ -2,7 +2,7 @@ CC=python
 
 SRCDIR=py
 
-ARTIFACTS=$(addprefix $(SRCDIR)/, edit_distance.c \
+ARTIFACTS=build $(addprefix $(SRCDIR)/, edit_distance.c \
 		    edit_distance.cpython-311-darwin.so)
 
 VALID_TARGETS=build clean help
