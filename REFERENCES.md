@@ -10,3 +10,5 @@
 # Microsoft TCP Description
 - [Windows TCP](https://learn.microsoft.com/en-us/troubleshoot/windows-server/networking/description-tcp-features)
 
+# Levenshtein Distance (Edit Distance)
+- [Wikipedia Article](https://en.wikipedia.org/wiki/Levenshtein_distance)
