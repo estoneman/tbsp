@@ -11,7 +11,7 @@ from win_stat import StatType
 
 def main():
     """Main method (for now) for testing sliding windows implementation"""
-    n = 1744
+    n = 500
     THRESHOLD = 0.000
     START = 50
 
