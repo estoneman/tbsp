@@ -51,10 +51,8 @@ speeding up the most repetitive actions during runtime.
 > python main.py
 ```
 
-This module visualizes how my current work is able to cover the most amount of
-data while maintaining high performance. I am currently working how to tune
-parameters to my code such that I can cover the most data with the most amount
-of speed.
+This module runs my sliding windows implementation with optimal window
+parameters set. It uses a list of domains exracted from the class server.
 
 _NOTE_: I am working on Mac OSX Ventura 13.3.1. I believe everything should be
 fine creating the virtual environment (use Powershell script located in
