@@ -21,7 +21,7 @@ def remove_tld(d: str) -> str:
             r -= 1
 
         sub_d.pop() # for that pesky period
-    except IndexError as err:
+    except IndexError:
         # input does not have '.' and len > 0, so return as is
         return d.strip()
 
@@ -78,7 +78,8 @@ def take(iterable, size):
         cnt += 1
 
 def sigmoid(x) -> float:
-    """Sigmoid function: https://en.wikipedia.org/wiki/Sigmoid_function
+    """UNUSED
+    Sigmoid function: https://en.wikipedia.org/wiki/Sigmoid_function
 
     Positional Arguments:
     x -- number to be scaled
@@ -89,6 +90,7 @@ def sigmoid(x) -> float:
     return 1 / float(1 + exp(-x))
 
 def bounded_tanh(x):
+    """UNUSED"""
     x = max(min(x, maximum), minimum)
-    
+   
     return math.tanh(x)

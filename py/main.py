@@ -1,10 +1,4 @@
 """Runner module for sliding windows implementation"""
-
-import time
-
-import matplotlib.pyplot as plt
-import numpy as np
-
 import win_proc
 from win_util import fetch_lines
 from win_stat import StatType
@@ -22,6 +16,6 @@ def main():
             StatType.STD_DEV.value
 
     win_proc.process_windows(domain_list, n, THRESHOLD, FLAGS)
-    
+
 if __name__ == "__main__":
     main()

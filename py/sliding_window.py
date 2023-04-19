@@ -2,7 +2,6 @@
 implementation
 """
 
-import math
 from statistics import fmean, stdev
 
 import numpy as np
