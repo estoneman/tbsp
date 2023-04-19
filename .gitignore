@@ -13,6 +13,7 @@ sandbox/
 DEPREC*
 TODO*
 USEME*
+py/bench.py
 py/*.c
 py/*.html
 py/*.so
