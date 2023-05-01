@@ -2,7 +2,7 @@ CC=python
 
 SRCDIR=py
 
-ARTIFACTS=build $(addprefix $(SRCDIR)/, edit_distance.c \
+ARTIFACTS=build/ $(addprefix $(SRCDIR)/, edit_distance.c \
 		    edit_distance.cpython-311-darwin.so)
 
 VALID_TARGETS=build clean help
@@ -17,7 +17,7 @@ build: $(SRC)
 
 .PHONY: clean
 clean:
-	@echo "Removing $(ARTIFACTS)"
+	@echo "Removing: $(ARTIFACTS)"
 	@rm -rf $(ARTIFACTS)
 
 .PHONY: help
