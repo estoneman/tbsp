@@ -2,6 +2,7 @@
 
 from itertools import combinations
 import multiprocessing as mp
+import math
 import os
 import time
 
@@ -30,16 +31,14 @@ def work(function, data, n_procs, threshold=0.70):
     buf = []
 
     with mp.Pool(processes=n_procs) as pool:
-        for pair in pool.imap(function, data, 2):
+        for pair in pool.map(function, data, os.cpu_count()):
             if pair[1] > threshold:
                 buf.append(pair)
 
     return buf
 
-def process_windows(domains,
-                    n: int,
-                    threshold: int,
-                    flags: int) -> None:
+def process_windows(domains, n: int, threshold: int, flags: int,
+                    max_win=-1) -> None:
     """Scores top k subdomains per window
 
     Positional Arguments:
@@ -58,8 +57,10 @@ def process_windows(domains,
 
     current_window = 1
 
-    win_max = 1000
-    win_min = 600
+    win_max = 1200
+    if max_win > 0:
+        win_max = max_win
+    win_min = math.floor(0.60 * win_max)
     if n <= win_max:
         win_min = win_max = n
 
