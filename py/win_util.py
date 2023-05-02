@@ -77,9 +77,9 @@ def take(iterable, size):
         yield elem
         cnt += 1
 
-def sigmoid(x) -> float:
+def reverse_sigmoid(x) -> float:
     """UNUSED
-    Sigmoid function: https://en.wikipedia.org/wiki/Sigmoid_function
+    Reverse Sigmoid function: https://en.wikipedia.org/wiki/Sigmoid_function
 
     Positional Arguments:
     x -- number to be scaled
@@ -87,7 +87,10 @@ def sigmoid(x) -> float:
     Returns:
     scaled version of input, `x`
     """
-    return 1 / float(1 + exp(-x))
+    return 1 / float(1 + exp(x))
+
+def parametrized_sigmoid(k, x) -> float:
+    return 1 / float(1 + exp(-k * (x - k)))
 
 def bounded_tanh(x):
     """UNUSED"""
