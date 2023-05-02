@@ -7,6 +7,7 @@ import os
 import time
 
 import numpy as np
+from scipy.sparse import lil_matrix
 
 import edit_distance
 from sliding_window import SlidingWindow
@@ -31,7 +32,7 @@ def work(function, data, n_procs, threshold=0.70):
     buf = []
 
     with mp.Pool(processes=n_procs) as pool:
-        for pair in pool.map(function, data, os.cpu_count()):
+        for pair in pool.imap(function, data, os.cpu_count()):
             if pair[1] > threshold:
                 buf.append(pair)
 
@@ -57,7 +58,7 @@ def process_windows(domains, n: int, threshold: int, flags: int,
 
     current_window = 1
 
-    win_max = 1200
+    win_max = 1500
     if max_win > 0:
         win_max = max_win
     win_min = math.floor(0.60 * win_max)
@@ -66,7 +67,6 @@ def process_windows(domains, n: int, threshold: int, flags: int,
 
     window = SlidingWindow(domains, win_min, win_min, win_max)
 
-    sim_mat = np.full((n,n), 0.000, dtype=np.float64)
 
     # === BEGIN WINDOW PROCESSING === #
     while n_processed < n:
@@ -176,12 +176,13 @@ def process_windows(domains, n: int, threshold: int, flags: int,
                 print("      - {:.3f}".format(window.mean(scores)))
 
         # === POPULATE SIMILARITY MATRIX ===
+        sim_mat = lil_matrix((n,n), dtype=np.float32)
         for pair_score in pair_scores:
             pair,score = pair_score
             x,y = (hash(pair[0]) % window.get_size()), \
                   (hash(pair[1]) % window.get_size())
 
-            sim_mat[x + n_processed,y + n_processed] = score
+            sim_mat[x + n_processed, y + n_processed] = score
 
         # === PREPARE NEXT WINDOW ===
         n_processed += window.get_size()
