@@ -80,9 +80,9 @@ class SlidingWindow:
         n_processed -- total amount of data read so far
         elapsed     -- total amount of time to compute current window
         """
-        # request = int(self.get_size() * math.exp(elapsed))
         request = self.get_size() + \
-                  int(self.get_size() * win_util.sigmoid(elapsed))
+                  int(self.get_size() * \
+                      win_util.parametrized_sigmoid(10, elapsed))
 
         self.resize(n, n_processed, request)
         self.set_data(win_util.take(corpus, self.get_size()))
