@@ -4,6 +4,7 @@ import unittest
 from edit_distance import edit_distance
 from sliding_window import SlidingWindow
 import win_util
+import win_stat
 
 class TestTbsp(unittest.TestCase):
     def setUp(self):
@@ -92,7 +93,7 @@ class TestTbsp(unittest.TestCase):
         
         # dummy window
         window = SlidingWindow(corpus, window_len, 0, window_len)
-        window_max = window.max(scores)
+        window_max = win_stat.win_max(scores)
 
         self.assertEqual(window_max, 5)
 
@@ -103,7 +104,7 @@ class TestTbsp(unittest.TestCase):
 
         # dummy window
         window = SlidingWindow(corpus, window_len, 0, window_len)
-        window_min = window.min(scores)
+        window_min = win_stat.win_min(scores)
 
         self.assertEqual(window_min, 0)
 
@@ -114,7 +115,7 @@ class TestTbsp(unittest.TestCase):
 
         # dummy window
         window = SlidingWindow(corpus, window_len, 0, window_len)
-        window_mean = window.mean(scores)
+        window_mean = win_stat.win_mean(scores)
 
         self.assertEqual(window_mean, sum(scores) / window_len)
 
@@ -125,7 +126,7 @@ class TestTbsp(unittest.TestCase):
 
         # dummy window
         window = SlidingWindow(corpus, window_len, 0, window_len)
-        window_std_dev = round(window.std_dev(scores), 3)
+        window_std_dev = round(win_stat.win_std_dev(scores), 3)
 
         self.assertEqual(window_std_dev, 1.871)
 
@@ -136,7 +137,7 @@ class TestTbsp(unittest.TestCase):
         window = SlidingWindow(corpus, window_len, 0, window_len)
 
         scores = range(window_len)
-        window_top_k = window.top_k(scores)
+        window_top_k = win_stat.win_top_k(scores)
 
         # k is set at 5
         self.assertListEqual(list(window_top_k), [1, 2, 3, 4, 5])
@@ -159,20 +160,19 @@ class TestTbsp(unittest.TestCase):
         corpus = win_util.fetch_lines(fn)
 
         window_len = 3
-        window = SlidingWindow(corpus, window_len, 0, window_len * 2)
+        window = SlidingWindow(corpus, window_len, 0, window_len)
 
         # simulate we are at offset 4 from start of corpus
-        #     i.e. the last window length + n_processed < 4
-        n_processed = 4
+        #     i.e. the last window length + n_processed < 9
+        n_processed = 9
 
-        # suppose our last window took 0 seconds to compute
+        # dummy elapsed
         elapsed = 0
 
-        # window size should be doubled after the slide
-        previous_size = window.get_size()
+        # window size should be 1 as there is only one domain left to process
         window.slide(corpus, n, n_processed, elapsed)
 
-        self.assertEqual(window.get_size(), previous_size * 2)
+        self.assertEqual(window.get_size(), 1)
 
     def test_edit_distance(self):
         subdomain1 = b"google"

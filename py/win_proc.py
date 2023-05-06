@@ -1,25 +1,22 @@
 """Domain name similarity using sliding windows and multiprocessing"""
 
 from itertools import combinations
-import multiprocessing as mp
-import math
-import os
 import time
+from types import GeneratorType
 
 import numpy as np
 from scipy.sparse import lil_matrix
 
 import edit_distance
 from sliding_window import SlidingWindow
-from win_stat import StatType
+from win_stat import compute_stats
 
-def work(function, data, n_procs, threshold=0.70):
-    """Multiprocessed helper for scoring pairs of domains
+def uniprocessed_work(function: callable, data: GeneratorType, threshold=0.70):
+    """Helper for scoring pairs of domains
 
     Positional Arguments:
     function    -- scoring function
     data        -- data to score (subdomains)
-    n_procs     -- number of processes to spawn
 
     Keyword Arguments:
     threshold   -- minimum score to keep
@@ -28,19 +25,11 @@ def work(function, data, n_procs, threshold=0.70):
     list of word pairs and respective scores
         e.g. (('domain1.com', 'domain2.com'), 0.900)
     """
+    return ((pair,score) for pair,score in \
+            map(function, data) if score > threshold)
 
-    buf = []
-
-    with mp.Pool(processes=n_procs) as pool:
-        for pair in pool.imap(function, data, os.cpu_count()):
-            if pair[1] > threshold:
-                buf.append(pair)
-
-    return buf
-
-def process_windows(domains, n: int, threshold: int, flags: int,
-                    max_win=-1) -> None:
-    """Scores top k subdomains per window
+def process_windows(domains, n: int, threshold: int, flags: int) -> None:
+    """Main window processor that includes optional statisical computation
 
     Positional Arguments:
     domains     -- input subdomains
@@ -50,23 +39,20 @@ def process_windows(domains, n: int, threshold: int, flags: int,
                    statistics
 
     Returns:
-    matrix of subdomains and their respective similarities
+    `scipy.lil_matrx` of subdomains and their respective similarities
     """
 
-    n_procs = int(os.cpu_count() / 2)
     n_processed = 0
 
     current_window = 1
 
-    win_max = 1500
-    if max_win > 0:
-        win_max = max_win
-    win_min = math.floor(0.60 * win_max)
-    if n <= win_max:
+    win_max = 4000
+    win_min = 2000
+    # make sure we don't compute on data we don't have
+    if n <= win_max or n <= win_min:
         win_min = win_max = n
 
     window = SlidingWindow(domains, win_min, win_min, win_max)
-
 
     # === BEGIN WINDOW PROCESSING === #
     while n_processed < n:
@@ -84,96 +70,17 @@ def process_windows(domains, n: int, threshold: int, flags: int,
         unique_pairs = combinations(window.get_data(), r=2)
 
         # === SCORE PAIRS OF DOMAINS ===
-        start = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
-        pair_scores = work(edit_distance.score_pair, unique_pairs,
-                           n_procs, threshold)
-        end = time.clock_gettime_ns(time.CLOCK_PROCESS_CPUTIME_ID)
+        pair_scores = uniprocessed_work(edit_distance.score_pair, unique_pairs,
+                                        threshold)
 
         # === COMPUTE STATS ===
-        top_k_scores = {idx:(ps[0], round(ps[1], 3))
-                        for idx,ps in enumerate(pair_scores)}
+        start = time.process_time()
+        compute_stats(pair_scores, flags)
+        elapsed = round(time.process_time() - start, 3)
 
-        scores = [pair[1] for pair in top_k_scores.values()]
-        len_scores = len(scores)
-
-        if flags & StatType.TOP_K.value != 0:
-            locs = window.top_k(scores)
-            max_len = 0
-            for loc in locs:
-                pair,_ = top_k_scores[loc]
-                max_pair_len = max(len(pair[0]), len(pair[1]))
-                if max_pair_len > max_len:
-                    max_len = max_pair_len
-
-            print("    Top 5 Scores:")
-            for loc in locs:
-                pair,score = top_k_scores[loc]
-                print("      - {:{}} | {:{}} | {:.3f}".format(pair[0].decode(),
-                                                         max_len,
-                                                         pair[1].decode(),
-                                                         max_len,
-                                                         score))
-
-        if flags & StatType.MAX.value != 0:
-            if len_scores == 0:
-                print("\x1b[33m+")
-                print("| Warning: `max` stat not computed. Either the\n"
-                      "| current window is empty or the threshold filtered\n"
-                      "| all scores")
-                print("+\x1b[0m")
-            elif len_scores == 1:
-                print("    Max Score:")
-                pair,score = top_k_scores[0]
-                print("      - {} | {} | {:.3f}".format(pair[0].decode(),
-                                                        pair[1].decode(),
-                                                        score))
-            else:
-                print("    Max Score:")
-                loc = window.max(scores)
-                pair,score = top_k_scores[loc]
-                print("      - {} | {} | {:.3f}".format(pair[0].decode(),
-                                                        pair[1].decode(),
-                                                        score))
-        if flags & StatType.MIN.value != 0:
-            if len_scores == 0:
-                print("\x1b[33m+")
-                print("| Warning: `min` stat not computed. Either the current\n"
-                      "| window is empty or the threshold filtered all scores")
-                print("+\x1b[0m")
-            elif len_scores == 1:
-                print("    Min Score:")
-                pair,score = top_k_scores[0]
-                print("      - {} | {} | {:.3f}".format(pair[0].decode(),
-                                                        pair[1].decode(),
-                                                        score))
-            else:
-                print("    Min Score:")
-                loc = window.min(scores)
-                pair,score = top_k_scores[loc]
-                print("      - {} | {} | {:.3f}".format(pair[0].decode(),
-                                                        pair[1].decode(),
-                                                        score))
-        if flags & StatType.STD_DEV.value != 0:
-            if len_scores < 2:
-                print("\x1b[33m+")
-                print("| Warning: `std_dev` stat not computed. Either the\n"
-                      "| current window is empty or the threshold\n"
-                      "| filtered all scores")
-                print("+\x1b[0m")
-            else:
-                print("    Standard Deviation:")
-                print("      - {:.3f}".format(window.std_dev(scores)))
-
-        if flags & StatType.MEAN.value != 0:
-            if len_scores < 1:
-                print("\x1b[33m+")
-                print("| Warning: `mean` stat not computed. Either the\n"
-                      "| current window is empty or the threshold filtered\n"
-                      "| all scores")
-                print("+\x1b[0m")
-            else:
-                print("    Mean Score:")
-                print("      - {:.3f}".format(window.mean(scores)))
+        # reset generator
+        pair_scores = uniprocessed_work(edit_distance.score_pair, unique_pairs,
+                                        threshold)
 
         # === POPULATE SIMILARITY MATRIX ===
         sim_mat = lil_matrix((n,n), dtype=np.float32)
@@ -187,7 +94,7 @@ def process_windows(domains, n: int, threshold: int, flags: int,
         # === PREPARE NEXT WINDOW ===
         n_processed += window.get_size()
         current_window += 1
-        elapsed = round((end - start) / float(10e9), 3)
+        print(f"    ttc: {elapsed}s")
         window.slide(domains, n, n_processed, elapsed)
 
     return sim_mat

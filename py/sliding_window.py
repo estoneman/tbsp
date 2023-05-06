@@ -2,10 +2,6 @@
 implementation
 """
 
-from statistics import fmean, stdev
-
-import numpy as np
-
 import win_util
 
 class SlidingWindow:
@@ -80,34 +76,8 @@ class SlidingWindow:
         n_processed -- total amount of data read so far
         elapsed     -- total amount of time to compute current window
         """
-        request = self.get_size() + \
-                  int(self.get_size() * \
-                      win_util.parametrized_sigmoid(10, elapsed))
+        request = int(self.get_size() * win_util.modified_tanh(0.1,
+                                                               elapsed, 10))
 
         self.resize(n, n_processed, request)
         self.set_data(win_util.take(corpus, self.get_size()))
-
-    def top_k(self, scores, k: int=5):
-        """top k scores from window"""
-        num_scores = len(scores)
-        if num_scores < k:
-            k = num_scores
-        k_top = np.argpartition(scores, -k)
-
-        return k_top[-k:]
-
-    def min(self, scores):
-        """minimum score from window"""
-        return np.argpartition(scores, 1)[0]
-
-    def max(self, scores):
-        """maximum score from window"""
-        return np.argpartition(scores, -1)[-1]
-
-    def mean(self, scores):
-        """average score"""
-        return fmean(scores)
-
-    def std_dev(self, scores):
-        """standard deviation of scores"""
-        return stdev(scores)

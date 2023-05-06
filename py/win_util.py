@@ -2,7 +2,7 @@
 
 import sys
 
-from math import exp
+from math import tanh
 
 def remove_tld(d: str) -> str:
     """Remove the TLD from a domain
@@ -77,23 +77,17 @@ def take(iterable, size):
         yield elem
         cnt += 1
 
-def reverse_sigmoid(x) -> float:
-    """UNUSED
-    Reverse Sigmoid function: https://en.wikipedia.org/wiki/Sigmoid_function
+def modified_tanh(k, x, c):
+    """Modified Hyperbolic Tangent Function to best adapt to all response
+    times
 
     Positional Arguments:
-    x -- number to be scaled
+    k -- steepness of the threshold between increasing and decreasing window
+         size
+    x -- time to compute upon window (in seconds)
+    c -- target response time
 
     Returns:
-    scaled version of input, `x`
+    scale to be applied to next window size
     """
-    return 1 / float(1 + exp(x))
-
-def parametrized_sigmoid(k, x) -> float:
-    return 1 / float(1 + exp(-k * (x - k)))
-
-def bounded_tanh(x):
-    """UNUSED"""
-    x = max(min(x, maximum), minimum)
-   
-    return math.tanh(x)
+    return tanh(-k * (x - c))
