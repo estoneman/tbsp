@@ -15,8 +15,9 @@ TODO*
 USEME*
 data/words_alpha.txt
 linter.sh
-py/data_coverage.py
 py/bench.py
+py/data_coverage.py
+py/max_window_perf.py
 py/*.c
 py/*.html
 py/*.so
