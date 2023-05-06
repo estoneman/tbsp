@@ -5,12 +5,10 @@ from win_stat import StatType
 
 def main():
     """Sample run of processing sliding windows of domains"""
-    # n = 1744 # total length of input file
-    n = 20000
+    n = 1744 # total length of input file
     THRESHOLD = 0.600
 
-    # domain_list = fetch_lines("../data/domains.in")
-    domain_list = fetch_lines("/usr/local/opt/wordlists/rockyou/rockyou.txt")
+    domain_list = fetch_lines("../data/domains.in")
     FLAGS = StatType.MAX.value     \
             | StatType.MIN.value   \
             | StatType.TOP_K.value \
