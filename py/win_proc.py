@@ -1,6 +1,6 @@
 """Domain name similarity using sliding windows and multiprocessing"""
 
-from itertools import combinations
+from itertools import combinations, tee
 import time
 from types import GeneratorType
 
@@ -10,6 +10,19 @@ from scipy.sparse import lil_matrix
 import edit_distance
 from sliding_window import SlidingWindow
 from win_stat import compute_stats
+
+def copy_generator(generator, num_copies=2):
+    """Generates multiple copies of a given generator
+
+    Positional Arguments:
+    generator -- types.GeneratorType iterable to be copied
+
+    Keyword Arguments:
+    num_copies -- quantity of copies to construct
+    """
+    gens: tuple = tee(generator, num_copies)
+    for gen in gens:
+        yield gen
 
 def uniprocessed_work(function: callable, data: GeneratorType, threshold=0.70):
     """Helper for scoring pairs of domains
@@ -25,7 +38,7 @@ def uniprocessed_work(function: callable, data: GeneratorType, threshold=0.70):
     list of word pairs and respective scores
         e.g. (('domain1.com', 'domain2.com'), 0.900)
     """
-    return ((pair,score) for pair,score in \
+    return ((pair, round(score, 3)) for pair,score in \
             map(function, data) if score > threshold)
 
 def process_windows(domains, n: int, threshold: int, flags: int) -> None:
@@ -48,6 +61,7 @@ def process_windows(domains, n: int, threshold: int, flags: int) -> None:
 
     win_max = 4000
     win_min = 2000
+
     # make sure we don't compute on data we don't have
     if n <= win_max or n <= win_min:
         win_min = win_max = n
@@ -73,23 +87,23 @@ def process_windows(domains, n: int, threshold: int, flags: int) -> None:
         pair_scores = uniprocessed_work(edit_distance.score_pair, unique_pairs,
                                         threshold)
 
+        # needed for both stats and similarity computations
+        scores_for_stats, scores_for_sim_mat = copy_generator(pair_scores)
+
         # === COMPUTE STATS ===
         start = time.process_time()
-        compute_stats(pair_scores, flags)
-        elapsed = round(time.process_time() - start, 3)
-
-        # reset generator
-        pair_scores = uniprocessed_work(edit_distance.score_pair, unique_pairs,
-                                        threshold)
+        compute_stats(scores_for_stats, flags)
 
         # === POPULATE SIMILARITY MATRIX ===
         sim_mat = lil_matrix((n,n), dtype=np.float32)
-        for pair_score in pair_scores:
+        for pair_score in scores_for_sim_mat:
             pair,score = pair_score
             x,y = (hash(pair[0]) % window.get_size()), \
                   (hash(pair[1]) % window.get_size())
 
             sim_mat[x + n_processed, y + n_processed] = score
+
+        elapsed = round(time.process_time() - start, 3)
 
         # === PREPARE NEXT WINDOW ===
         n_processed += window.get_size()
