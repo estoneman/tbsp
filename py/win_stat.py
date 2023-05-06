@@ -18,8 +18,8 @@ def compute_stats(pair_scores: GeneratorType, flags: int) -> None:
     """Compute a variety of statistics (see above for supported flags)
 
     PositionalArguments:
-    - pair_scores -- unique pairs of a window with respective scores
-    - flags -- bit mask of desired statistics to compute
+    pair_scores -- unique pairs of a window with respective scores
+    flags -- bit mask of desired statistics to compute
     """
     pair_score_index = {idx:(ps[0], round(ps[1], 3))
                         for idx,ps in enumerate(pair_scores)}
